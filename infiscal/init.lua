@@ -1,37 +1,7 @@
 local kong_meta                   = require "kong.meta"
-local ffi                         = require "ffi"
 local http                        = require "resty.http"
 local json                        = require "cjson"
-
-local type                        = type
-local gsub                        = string.gsub
-local upper                       = string.upper
-local find                        = string.find
-local sub                         = string.sub
-local str                         = ffi.string
 local kong                        = kong
-local ngx                         = ngx
--- local http  = require "resty.http"
-local DEFAULT_HTTP_CLINET_TIMEOUT = 1000
-
-local function dump(o)
-  if type(o) == 'table' then
-    local s = '{ '
-    for k, v in pairs(o) do
-      if type(k) ~= 'number' then k = '"' .. k .. '"' end
-      s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-    end
-    return s .. '} '
-  else
-    return tostring(o)
-  end
-end
-
-local ENV = {}
-
-ffi.cdef [[
-  extern char **environ;
-]]
 
 local function init()
  kong.log.notice("warmup of infiscal vault!")
@@ -53,7 +23,6 @@ local function get_auth_token(url, body, timeout)
   })
   if err then
     local err_s = json.encode({
-      message = 'got err',
       error   = tostring(err)
     })
     error(err_s)
@@ -61,9 +30,8 @@ local function get_auth_token(url, body, timeout)
 
   if res.status ~= 200 then
     local err_s = json.encode({
-      message    = 'got err',
-      sts_status = res.status,
-      sts_body   = json.decode(res.body)
+      status = res.status,
+      body   = json.decode(res.body)
     })
     error(err_s)
   end
@@ -79,11 +47,6 @@ local path_auth = "/api/v1/auth/universal-auth/login"
 local cache_key = "infiscal-token"
 
 local function get(conf, resource, version)
-  kong.log.notice("get called on infiscal vault!")
-  -- kong.log.err(dump({conf = conf, resource = resource, version = version}))
-  -- if true then
-  --   return "yes"
-  -- end
   local base_url = conf.connection.base_url
   local token_res, err = kong.cache:get(cache_key, nil, get_auth_token, base_url .. path_auth, conf.auth,
     conf.connection.timeouts.auth)
@@ -113,7 +76,6 @@ local function get(conf, resource, version)
 
   if err then
     local err_s = json.encode({
-      message = 'got err',
       error   = tostring(err)
     })
     return nil, err_s
@@ -121,9 +83,8 @@ local function get(conf, resource, version)
 
   if res.status ~= 200 then
     local err_s = json.encode({
-      message    = 'got err',
-      sts_status = res.status,
-      sts_body   = json.decode(res.body)
+      status = res.status,
+      body   = json.decode(res.body)
     })
     return nil, err_s
   end
@@ -133,7 +94,6 @@ local function get(conf, resource, version)
     error(err)
   end
   local value = credentials.secret.secretValue
-  -- kong.log.err(value)
   return value
 end
 

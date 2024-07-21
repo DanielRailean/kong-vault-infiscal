@@ -9,37 +9,29 @@ return {
             ttl = {
               type = "number",
               default = 60 * 60,
+              required = true,
+              -- between 5 minutes and one week
+              between = {5 * 60, 7 * 24 * 60 * 60}
+            }
+          },
+          {
+            neg_ttl = {
+              type = "number",
+              default = 5,
+              required = true,
+              -- betweeen 5 seconds and one day
+              between = {5, 24 * 60 * 60}
+            },
+          },
+          {
+            resurrect_ttl = {
+              type = "number",
+              default = 60,
+              -- betweeen 5 seconds and one hour
+              between = {5 , 60 * 60},
               required = true
             }
           },
-          -- {
-          --   neg_ttl = {
-          --     type = "number",
-          --     default = 0,
-          --     required = true
-          --   },
-          -- },
-          -- {
-          --   resurrect_ttl = {
-          --     type = "number",
-          --     default = 24 * 60 * 60,
-          --     required = true
-          --   }
-          -- },
-          -- {
-          --   min_ttl = {
-          --     type = "number",
-          --     default = 5,
-          --     required = true
-          --   }
-          -- },
-          -- {
-          --   max_ttl = {
-          --     type = "number",
-          --     default = 10,
-          --     required = true
-          --   }
-          -- },
           {
             connection = {
               type = "record",
