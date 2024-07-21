@@ -88,6 +88,10 @@ local function get(conf, resource, version)
   local token_res, err = kong.cache:get(cache_key, nil, get_auth_token, base_url .. path_auth, conf.auth,
     conf.connection.timeouts.auth)
 
+  if not token_res then
+    error(err)
+  end
+
   if token_res.ttl then
     -- setting a proper ttl for the token
     kong.cache:renew(cache_key, { ttl = token_res.ttl }, echo_value, { token = token_res.token })
