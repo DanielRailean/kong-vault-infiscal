@@ -14,30 +14,19 @@ local buffer = require "string.buffer"
 local clone = require "table.clone"
 local cjson = require("cjson.safe").new()
 
-
-local yield = require("kong.tools.yield").yield
-local get_updated_now_ms = require("kong.tools.time").get_updated_now_ms
 local replace_dashes = require("kong.tools.string").replace_dashes
-
-local function log_not_implemented(function_name)
-  kong.log.notice(function_name .. " called, not implemented!")
-end
 
 local kong = kong
 
 local ngx = ngx
 local get_phase = ngx.get_phase
-local max = math.max
-local min = math.min
 local fmt = string.format
 local sub = string.sub
 local byte = string.byte
 local type = type
-local sort = table.sort
 local pcall = pcall
 local lower = string.lower
 local pairs = pairs
-local ipairs = ipairs
 local concat = table.concat
 local md5_bin = ngx.md5_bin
 local tostring = tostring
@@ -49,11 +38,11 @@ local parse_path = require("socket.url").parse_path
 local encode_base64url = require("ngx.base64").encode_base64url
 local decode_json = cjson.decode
 
--- local ROTATION_INTERVAL = tonumber(os.getenv("KONG_VAULT_ROTATION_INTERVAL") or "60", 10)
-local ROTATION_INTERVAL = 60
+local function log_not_implemented(function_name)
+  kong.log.debug(function_name .. " called, not implemented!")
+end
 
 local VAULT_QUERY_OPTS = { workspace = ngx.null }
-
 
 ---
 -- Checks if the passed in reference looks like a reference.
@@ -716,7 +705,7 @@ local function new(self)
   end
 
   local function try(callback, options)
-    kong.log.err("Try called, but not implemented")
+    log_not_implemented("try")
   end
 
   ---
@@ -936,7 +925,7 @@ local function new(self)
   -- @local
   -- @function kong.vault.warmup
   function _VAULT.warmup(input)
-    kong.log.notice("warmup called in ", get_phase())
+    kong.log.debug("vault warmup called in ", get_phase())
     for k, v in pairs(input) do
       local kt = type(k)
       if kt == "table" then

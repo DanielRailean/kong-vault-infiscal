@@ -4,7 +4,7 @@ local json                        = require "cjson"
 local kong                        = kong
 
 local function init()
- kong.log.notice("warmup of infiscal vault!")
+ kong.log.debug("infiscal vault init called!")
 end
 
 local function echo_value(value)
@@ -58,7 +58,7 @@ local function get(conf, resource, version)
   if token_res.ttl then
     -- setting a proper ttl for the token
     kong.cache:renew(cache_key, { ttl = token_res.ttl }, echo_value, { token = token_res.token })
-    kong.log.notice("token for '" .. conf.auth.clientId .. "' clientId will expire in " .. token_res.ttl .. "s")
+    kong.log.debug("token for '" .. conf.auth.clientId .. "' clientId will expire in " .. token_res.ttl .. "s")
   end
 
   local client = http:new()
